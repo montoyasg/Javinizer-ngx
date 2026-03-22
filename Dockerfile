@@ -52,7 +52,7 @@ RUN pwsh -c "ln -s (Join-Path (Get-InstalledModule Javinizer).InstalledLocation 
 # Add PowerShell Universal environment variables
 ENV Kestrel__Endpoints__HTTP__Url http://*:8600
 ENV Data__RepositoryPath ./data/Repository
-ENV Data__ConnectionString ./data/database.db
+ENV Data__ConnectionString Data Source=./data/database.db
 ENV Logging__SystemLogPath ./data/logs/log.txt
 
 EXPOSE 8600
