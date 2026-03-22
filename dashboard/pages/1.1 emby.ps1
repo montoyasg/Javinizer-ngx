@@ -10,7 +10,7 @@ function Get-EmbyActors {
 }
 
 New-UDPage -Name 'Emby/Jellyfin' -Content {
-    New-UDScrollUp
+    
     New-UDGrid -Container -Content {
         New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
             New-UDPaper -Content {

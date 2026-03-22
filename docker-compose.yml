@@ -1,0 +1,17 @@
+services:
+  javinizer:
+    container_name: javinizer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8600:8600
+    restart: unless-stopped
+    environment:
+      - TZ=UTC
+    volumes:
+      - javinizer-data:/root
+      - ./data:/home/data
+
+volumes:
+  javinizer-data:

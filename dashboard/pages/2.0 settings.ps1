@@ -160,7 +160,7 @@ New-UDPage -Name "Settings" -Content {
     )
 
     New-UDDynamic -Id 'dynamic-settings-page' -Content {
-        New-UDScrollUp
+        
         New-UDGrid -Container -Content {
             ## Left Column
             New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 6 -Content {

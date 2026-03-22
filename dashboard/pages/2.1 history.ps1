@@ -1,5 +1,5 @@
 New-UDPage -Name 'History' -Content {
-    New-UDScrollUp
+    
     New-UDGrid -Container -Content {
         New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
             New-UDPaper -Content {

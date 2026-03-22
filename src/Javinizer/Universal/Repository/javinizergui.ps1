@@ -12,13 +12,7 @@ $cache:defaultUncensorPath = Join-Path -Path $cache:modulePath -ChildPath 'jvUnc
 $cache:defaultHistoryPath = Join-Path -Path $cache:modulePath -ChildPath 'jvHistory.csv'
 $cache:defaultThumbPath = Join-Path -Path $cache:modulePath -ChildPath 'jvThumbs.csv'
 
-# Import Javinizer and Universal Dashboard dependencies
-Import-Module UniversalDashboard.CodeEditor
-Import-Module UniversalDashboard.Style
-Import-Module UniversalDashboard.UDPlayer
-Import-Module UniversalDashboard.UDScrollUp
-Import-Module UniversalDashboard.UDSpinner
-Import-Module UniversalDashboard.Charts
+# Import Javinizer module
 Import-Module $cache:fullModulePath
 
 # Load Javinizer settings
@@ -483,12 +477,12 @@ function Show-JVProgressModal {
                 } else {
                     if ($NoCancel) {
                         Show-UDModal -Persistent -Content {
-                            New-UDSpinner -tagName 'ImpulseSpinner' -frontColor "#303f9f" -backColor "#383838"
+                            New-UDProgress -Circular
                             #New-UDSpinner -tagName 'RotateSpinner' -color "#00cc00"
                         }
                     } else {
                         Show-UDModal -Persistent -Content {
-                            New-UDSpinner -tagName 'ImpulseSpinner' -frontColor "#303f9f" -backColor "#383838"
+                            New-UDProgress -Circular
                         } -Footer {
                             New-UDButton -Text 'Cancel' -FullWidth -OnClick {
                                 # The runspace that we want to close is created from Invoke-JVParallel
@@ -948,7 +942,7 @@ function New-JVAppBar {
 
 $Pages += New-UDPage -Name "Sort" -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
     $cache:fileBrowserType = 'Sort'
     New-UDStyle -Style '
     .MuiFormHelperText-root {
@@ -1332,7 +1326,11 @@ $Pages += New-UDPage -Name "Sort" -Content {
                                     if ($null -ne $cache:findData[$cache:index].Data.TrailerUrl) {
                                         New-UDButton -Icon $iconVideo -Text 'Trailer' -Size small -FullWidth -OnClick {
                                             Show-UDModal -FullWidth -MaxWidth sm -Content {
-                                                New-UDPlayer -URL $cache:findData[$cache:index].Data.TrailerUrl -Width '550px'
+                                                New-UDElement -Tag 'video' -Attributes @{
+                                                    src      = $cache:findData[$cache:index].Data.TrailerUrl
+                                                    controls = $true
+                                                    style    = @{ width = '550px' }
+                                                }
                                             }
                                         }
                                     }
@@ -2884,7 +2882,7 @@ $Pages += New-UDPage -Name "Sort" -Content {
 
 $Pages += New-UDPage -Name 'Emby' -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
     New-UDGrid -Container -Content {
         New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
             New-UDTypography -Text "If you use Emby or Jellyfin, you will need to use its API to POST actor images into your server. To use this feature of Javinizer, first define 'emby.baseurl' and 'emby.apikey' on the settings page.
@@ -2983,7 +2981,7 @@ $Pages += New-UDPage -Name 'Emby' -Content {
 
 $Pages += New-UDPage -Name "Settings" -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
 
     New-UDDynamic -Id 'dynamic-settings-page' -Content {
         New-UDGrid -Container -Content {
@@ -3749,7 +3747,7 @@ $Pages += New-UDPage -Name "Settings" -Content {
 
 $Pages += New-UDPage -Name 'Stats' -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
     New-UDGrid -Container -Content {
         New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
             New-UDPaper -Content {
@@ -3814,7 +3812,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @sortDateOptions
+                            New-UDChart @sortDateOptions
                         }
                     }
 
@@ -3830,7 +3828,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @sortDateOptions
+                            New-UDChart @sortDateOptions
                         }
                     }
 
@@ -3846,7 +3844,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @makerOptions
+                            New-UDChart @makerOptions
                         }
                     }
 
@@ -3862,7 +3860,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @genreOptions
+                            New-UDChart @genreOptions
                         }
                     }
 
@@ -3885,7 +3883,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @actressOptions
+                            New-UDChart @actressOptions
                         }
                     }
 
@@ -3901,7 +3899,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
                                 BorderColor     = '#4685F4'
                             }
 
-                            New-UDChartJS @actressOptions
+                            New-UDChart @actressOptions
                         }
                     }
 
@@ -3972,7 +3970,7 @@ $Pages += New-UDPage -Name 'Stats' -Content {
 
 $Pages += New-UDPage -Name 'Console' -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
     New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
         New-UDCard -Title 'Console' -Content {
             New-UDGrid -Container -Content {
@@ -4057,7 +4055,7 @@ $Pages += New-UDPage -Name 'Console' -Content {
 
 $Pages += New-UDPage -Name 'About' -Content {
     New-JVAppBar
-    New-UDScrollUp
+    
     New-UDGrid -Container -Content {
         New-UDGrid -Item -ExtraSmallSize 12 -SmallSize 12 -MediumSize 12 -Content {
             New-UDCard -Title 'About Javinizer' -Content {
@@ -4097,4 +4095,4 @@ $Pages += New-UDPage -Name 'About' -Content {
 }
 
 $cache:defaultTheme = 'light'
-New-UDDashboard -Title "Javinizer Web" -Theme $Theme -Pages $Pages -DefaultTheme $cache:settings.'web.theme'
+New-UDApp -Title "Javinizer Web" -Theme $Theme -Pages $Pages

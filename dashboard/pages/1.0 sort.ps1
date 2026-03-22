@@ -189,12 +189,12 @@ function InProgress {
                 } else {
                     if ($NoCancel) {
                         Show-UDModal -Persistent -Content {
-                            New-UDSpinner -tagName 'ImpulseSpinner' -frontColor "#303f9f" -backColor "#383838"
+                            New-UDProgress -Circular
                             #New-UDSpinner -tagName 'RotateSpinner' -color "#00cc00"
                         }
                     } else {
                         Show-UDModal -Persistent -Content {
-                            New-UDSpinner -tagName 'ImpulseSpinner' -frontColor "#303f9f" -backColor "#383838"
+                            New-UDProgress -Circular
                         } -Footer {
                             New-UDButton -Text 'Cancel' -FullWidth -OnClick {
                                 # The runspace that we want to close is created from Invoke-JVParallel
@@ -296,7 +296,7 @@ function JavinizerSearch {
 }
 
 New-UDPage -Name "Sort" -Content {
-    New-UDScrollUp
+    
     New-UDStyle -Style '
     .MuiFormHelperText-root {
         margin: 0;
@@ -627,7 +627,11 @@ New-UDPage -Name "Sort" -Content {
                                     if ($null -ne $cache:findData[$cache:index].Data.TrailerUrl) {
                                         New-UDButton -Icon $iconVideo -Text 'Trailer' -Size small -FullWidth -OnClick {
                                             Show-UDModal -FullWidth -MaxWidth lg -Content {
-                                                New-UDPlayer -URL $cache:findData[$cache:index].Data.TrailerUrl -Width '550px'
+                                                New-UDElement -Tag 'video' -Attributes @{
+                                                    src      = $cache:findData[$cache:index].Data.TrailerUrl
+                                                    controls = $true
+                                                    style    = @{ width = '550px' }
+                                                }
                                             }
                                         }
                                     }

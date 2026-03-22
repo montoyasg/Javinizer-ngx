@@ -7,11 +7,6 @@ $cache:settingsPath = Join-Path -Path $cache:modulePath -ChildPath 'jvSettings.j
 $cache:defaultLogPath = Join-Path -Path $cache:modulePath -ChildPath 'jvLog.log'
 $cache:defaultHistoryPath = Join-Path -Path $cache:modulePath -ChildPath 'jvHistory.csv'
 $cache:defaultThumbPath = Join-Path -Path $cache:modulePath -ChildPath 'jvThumbs.csv'
-Import-Module "/home/UniversalDashboard.CodeEditor/1.0.4/UniversalDashboard.CodeEditor.psd1"
-Import-Module UniversalDashboard.Style
-Import-Module UniversalDashboard.UDPlayer
-Import-Module UniversalDashboard.UDScrollUp
-Import-Module UniversalDashboard.UDSpinner
 Import-Module $cache:fullModulePath
 $cache:settings = Get-Content -Path $cache:settingsPath | ConvertFrom-Json
 if (Test-Path -LiteralPath ($cache:settings.'location.log')) {
@@ -85,4 +80,4 @@ $Theme = @{
     }
 }
 
-New-UDDashboard -Title "Javinizer Web" -Pages $Pages -Theme $Theme
+New-UDApp -Title "Javinizer Web" -Pages $Pages -Theme $Theme
