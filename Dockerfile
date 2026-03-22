@@ -24,6 +24,7 @@ RUN wget -O /home/Universal.linux-x64.zip https://powershelluniversal.devolution
 # Extract PowerShell Universal to /home/Universal
 RUN unzip -q /home/Universal.linux-x64.zip -d /home/Universal/ \
     && chmod +x /home/Universal/Universal.Server \
+    && find /home/Universal/Hosts -name 'PowerShellUniversal.Host' -exec chmod +x {} + \
     && rm /home/Universal.linux-x64.zip
 
 # Install mediainfo
