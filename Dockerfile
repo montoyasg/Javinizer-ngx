@@ -11,12 +11,11 @@ FROM python:3.12-slim
 
 # Install PowerShell and mediainfo
 RUN apt-get update \
-    && apt-get install -y wget apt-transport-https software-properties-common \
-    && wget -q "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" \
-    && dpkg -i packages-microsoft-prod.deb \
-    && rm packages-microsoft-prod.deb \
+    && apt-get install -y curl gnupg apt-transport-https mediainfo \
+    && curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/microsoft.list \
     && apt-get update \
-    && apt-get install -y powershell mediainfo \
+    && apt-get install -y powershell \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
