@@ -1,70 +1,45 @@
-FROM python:3.9.6-bullseye
+# ── Stage 1: Build React frontend ──
+FROM node:22-slim AS frontend-build
+WORKDIR /build
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
 
-# Add docker entrypoint script
-ADD docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
+# ── Stage 2: Runtime ──
+FROM python:3.12-slim
 
-# Install dependencies
+# Install PowerShell and mediainfo
 RUN apt-get update \
-    && apt-get install -y unzip wget
-
-# Create directories
-RUN mkdir -p /home/data/Repository/.universal \
-    && mkdir -p /home/Universal
-
-# Add dashboard files
-ADD src/Javinizer/Universal/Repository/javinizergui.ps1 /home/data/Repository
-ADD src/Javinizer/Universal/Repository/dashboards.ps1 /home/data/Repository/.universal
-
-# Download powershell universal
-WORKDIR /home
-RUN wget https://imsreleases.blob.core.windows.net/universal/production/1.5.13/Universal.linux-x64.1.5.13.zip
-
-# Extract powershell universal to /home/Universal
-RUN unzip -q /home/Universal.linux-x64.1.5.13.zip -d /home/Universal/ \
-    && chmod +x /home/Universal/Universal.Server \
-    && rm /home/Universal.linux-x64.1.5.13.zip
-
-# Install mediainfo
-RUN apt-get install -y mediainfo
-
-# Install pwsh
-RUN wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb \
+    && apt-get install -y wget apt-transport-https software-properties-common \
+    && wget -q "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" \
     && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
     && apt-get update \
-    && apt-get install -y powershell \
+    && apt-get install -y powershell mediainfo \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pwsh modules
+# Install Python dependencies
+COPY backend/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+    && pip install --no-cache-dir pillow googletrans==4.0.0rc1 requests
+
+# Install PowerShell modules
 RUN pwsh -c "Set-PSRepository 'PSGallery' -InstallationPolicy Trusted" \
-    && pwsh -c "Install-Module UniversalDashboard.Style" \
-    && pwsh -c "Install-Module UniversalDashboard.Charts" \
-    && pwsh -c "Install-Module UniversalDashboard.UDPlayer" \
-    && pwsh -c "Install-Module UniversalDashboard.UDSpinner" \
-    && pwsh -c "Install-Module UniversalDashboard.UDScrollUp" \
-    && pwsh -c "Install-Module UniversalDashboard.CodeEditor" \
     && pwsh -c "Install-Module Javinizer"
-
-# Install python modules
-RUN pip3 install pillow \
-    google_trans_new \
-    googletrans==4.0.0rc1 \
-    requests
-
-# Clean up
-#RUN apt-get purge unzip \
-#    wget \
-#    && apt-get autoremove
 
 # Create symlink to module settings file
 RUN pwsh -c "ln -s (Join-Path (Get-InstalledModule Javinizer).InstalledLocation -ChildPath jvSettings.json) /home/jvSettings.json"
 
-# Add powershell universal environmental variables
-ENV Kestrel__Endpoints__HTTP__Url http://*:8600
-ENV Data__RepositoryPath ./data/Repository
-ENV Data__ConnectionString ./data/database.db
-ENV UniversalDashboard__AssetsFolder ./data/UniversalDashboard
-ENV Logging__Path ./data/logs/log.txt
+# Copy backend
+COPY backend/ /app/backend/
+
+# Copy built frontend
+COPY --from=frontend-build /build/dist /app/frontend/dist
+
+WORKDIR /app
+ENV JV_SETTINGS_PATH=/home/jvSettings.json
 
 EXPOSE 8600
-ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8600"]
